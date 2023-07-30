@@ -1,7 +1,5 @@
 from rest_framework import serializers
 
-from django.contrib.auth.hashers import make_password
-
 from drf_base64.fields import Base64ImageField
 
 from users.models import User
@@ -120,7 +118,7 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
     image = Base64ImageField()
 
     class Meta:
-        fields = ('ingredients', 'tags',  'image', 'name', 'text',
+        fields = ('ingredients', 'tags', 'image', 'name', 'text',
                   'cooking_time', 'author')
         model = Recipe
 
