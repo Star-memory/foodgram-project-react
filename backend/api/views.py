@@ -2,11 +2,13 @@ from rest_framework import permissions, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
+from django.http import HttpResponse
+
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 
 from users.models import User
-from reviews.models import (Tag, Recipe, Ingredient,
+from reviews.models import (Tag, Recipe, Ingredient, RecipeIngredient,
                             FavoriteRecipe, Follow, ShoppingCartRecipe)
 
 
@@ -169,6 +171,40 @@ class RecipeViewSet(viewsets.ModelViewSet):
                               recipe=recipe_cart).delete()
             return Response({'detail': 'Рецепт успешно удален из покупок.'},
                             status=status.HTTP_204_NO_CONTENT)
+
+    @action(detail=False, methods=['get'],
+            permission_classes=[permissions.IsAuthenticated])
+    def download_shopping_cart(self, request):
+        user = request.user
+        recipes_cart = ShoppingCartRecipe.objects.filter(
+            user=user).values_list('recipe', flat=True)
+        ingredients = RecipeIngredient.objects.filter(
+            recipe__in=recipes_cart)
+
+        ingredient_sum = {}
+
+        for ingredient in ingredients:
+            name = ingredient.ingredient.name
+            unit = ingredient.ingredient.measurement_unit
+            amount = ingredient.amount
+
+            key = (name, unit)
+
+            if key in ingredient_sum:
+                ingredient_sum[key] += amount
+            else:
+                ingredient_sum[key] = amount
+
+        file_list = []
+        for (name, unit), total_amount in ingredient_sum.items():
+            file_list.append(f"{name} - {total_amount} {unit}.")
+
+        content = 'Список покупок:\n' + '\n'.join(file_list)
+
+        FILE_NAME = 'shopping_list.txt'
+        response = HttpResponse(content, content_type='text/plain')
+        response['Content-Disposition'] = f'attachment; filename="{FILE_NAME}"'
+        return response
 
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
