@@ -7,6 +7,11 @@ __pycache__/
 *.so
 
 # Distribution / packaging
+frontend/node_modules/
+frontend/build/
+frontend/src/
+frontend/public/
+infra/nginx copy
 .Python
 build/
 develop-eggs/
@@ -130,3 +135,5 @@ dmypy.json
 
 # .idea
 .idea
+
+api/media

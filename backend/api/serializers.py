@@ -2,13 +2,15 @@ from rest_framework import serializers
 
 from drf_base64.fields import Base64ImageField
 
+from djoser.serializers import UserCreateSerializer, UserSerializer
+
 from users.models import User
 from reviews.models import (Tag, Recipe, Ingredient,
                             RecipeIngredient, FavoriteRecipe,
                             Follow, ShoppingCartRecipe)
 
 
-class UserSerializer(serializers.ModelSerializer):
+class UserSerializer(UserSerializer):
     is_subscribed = serializers.SerializerMethodField()
 
     class Meta:
@@ -28,24 +30,12 @@ class UserSerializer(serializers.ModelSerializer):
         return Follow.objects.filter(user=user, author=obj).exists()
 
 
-class UserReadSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        fields = ('email', 'id', 'username', 'first_name',
-                  'last_name')
-        model = User
-
-
-class UserRegistrationSerializer(serializers.ModelSerializer):
+class UserRegistrationSerializer(UserCreateSerializer):
 
     class Meta:
         fields = ('email', 'username', 'first_name',
                   'last_name', 'password')
         model = User
-
-    def to_representation(self, instance):
-        return UserReadSerializer(instance,
-                                  context=self.context).data
 
 
 class TagSerializer(serializers.ModelSerializer):
