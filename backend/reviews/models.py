@@ -130,38 +130,6 @@ class ShoppingCartRecipe(BaseRecipe):
         verbose_name_plural = 'рецепты для карточки'
 
 
-# class ShoppingCartRecipe(models.Model):
-#     user = models.ForeignKey(
-#         User, on_delete=models.CASCADE, verbose_name='пользователь')
-#     recipe = models.ForeignKey(
-#         Recipe, on_delete=models.CASCADE, verbose_name='рецепт')
-
-#     class Meta:
-#         ordering = ['id']
-#         verbose_name = 'рецепт для карточки'
-#         verbose_name_plural = 'рецепты для карточки'
-#         constraints = [
-#             models.UniqueConstraint(
-#                 fields=['user', 'recipe'], name='uniq_cart')
-#         ]
-
-
-# class FavoriteRecipe(models.Model):
-#     user = models.ForeignKey(
-#         User, on_delete=models.CASCADE, verbose_name='пользователь')
-#     recipe = models.ForeignKey(
-#         Recipe, on_delete=models.CASCADE, verbose_name='рецепт')
-
-#     class Meta:
-#         ordering = ['id']
-#         verbose_name = 'рецепт для подписки'
-#         verbose_name_plural = 'рецепты для подписки'
-#         constraints = [
-#             models.UniqueConstraint(
-#                 fields=['user', 'recipe'], name='uniq_favoerite')
-#         ]
-
-
 class Follow(models.Model):
     user = models.ForeignKey(
         User, on_delete=models.CASCADE,

@@ -40,6 +40,7 @@ class UserViewSet(DjoserUserViewSet, CreateDestroyMixin):
     @action(detail=True, methods=['post', 'delete'],
             permission_classes=[permissions.IsAuthenticated])
     def subscribe(self, request, id):
+        """Добавление/удаление из списка любимых аторов"""
         user = self.request.user
         author = get_object_or_404(User, id=id)
         if request.method == 'POST':
@@ -53,10 +54,9 @@ class UserViewSet(DjoserUserViewSet, CreateDestroyMixin):
                 obj_field='user', obj_id_field='author',
                 obj=user, obj_id=author,
                 error_message='Вы уже подписаны на этого пользователя.')
-        if request.method == 'DELETE':
-            return self.destroy_сustom(
-                request, Follow, obj_field='user', obj_id_field='author',
-                obj=user, obj_id=author, detail_message='Успешная отписка.')
+        return self.destroy_сustom(
+            request, Follow, obj_field='user', obj_id_field='author',
+            obj=user, obj_id=author, detail_message='Успешная отписка.')
 
     @action(detail=False, methods=['get'],
             permission_classes=[permissions.IsAuthenticated],
@@ -112,6 +112,7 @@ class RecipeViewSet(viewsets.ModelViewSet, CreateDestroyMixin):
     @action(detail=True, methods=['post', 'delete'],
             permission_classes=[permissions.IsAuthenticated])
     def favorite(self, request, pk):
+        """Добавление/удаление из списка любимых рецептов"""
         user = self.request.user
         recipe = get_object_or_404(Recipe, id=pk)
         if request.method == 'POST':
@@ -120,17 +121,17 @@ class RecipeViewSet(viewsets.ModelViewSet, CreateDestroyMixin):
                 obj_field='user', obj_id_field='recipe',
                 obj=user, obj_id=recipe,
                 error_message='Этот рецепт уже в избранном.')
-        if request.method == 'DELETE':
-            return self.destroy_сustom(
-                request, FavoriteRecipe,
-                obj_field='user', obj_id_field='recipe',
-                obj=user, obj_id=recipe,
-                detail_message='Рецепт успешно удален из избранного.')
+        return self.destroy_сustom(
+            request, FavoriteRecipe,
+            obj_field='user', obj_id_field='recipe',
+            obj=user, obj_id=recipe,
+            detail_message='Рецепт успешно удален из избранного.')
 
     @action(detail=True, methods=['post', 'delete'],
             permission_classes=[permissions.IsAuthenticated],
             pagination_class=None)
     def shopping_cart(self, request, pk):
+        """Добавление/удаление из списка загрузки"""
         user = self.request.user
         recipe_cart = get_object_or_404(Recipe, id=pk)
         if request.method == 'POST':
@@ -139,31 +140,27 @@ class RecipeViewSet(viewsets.ModelViewSet, CreateDestroyMixin):
                 obj_field='user', obj_id_field='recipe',
                 obj=user, obj_id=recipe_cart,
                 error_message='Этот рецепт уже в списке покупок.')
-        if request.method == 'DELETE':
-            return self.destroy_сustom(
-                request, ShoppingCartRecipe,
-                obj_field='user', obj_id_field='recipe',
-                obj=user, obj_id=recipe_cart,
-                detail_message='Рецепт успешно удален из списка покупок.')
+        return self.destroy_сustom(
+            request, ShoppingCartRecipe,
+            obj_field='user', obj_id_field='recipe',
+            obj=user, obj_id=recipe_cart,
+            detail_message='Рецепт успешно удален из списка покупок.')
 
     @action(detail=False, methods=['get'],
             permission_classes=[permissions.IsAuthenticated])
     def download_shopping_cart(self, request):
+        """Загрузка списка покупок"""
         user = request.user
-
         ingredient_sum = RecipeIngredient.objects.filter(
             recipe__shoppingcartrecipe__user=user).values(
             'ingredient__name', 'ingredient__measurement_unit'
-        ).annotate(
-            amount_sum=Sum('amount')
-        )
+        ).annotate(amount_sum=Sum('amount'))
 
-        file_list = []
-        for ingredient in ingredient_sum:
-            name = ingredient['ingredient__name']
-            unit = ingredient['ingredient__measurement_unit']
-            amount_sum = ingredient['total_amount']
-            file_list.append(f"{name} - {amount_sum} {unit}.")
+        file_list = [
+            f"{ingredient['ingredient__name']} - {ingredient['amount_sum']}"
+            f"{ingredient['ingredient__measurement_unit']}."
+            for ingredient in ingredient_sum
+        ]
 
         content = 'Список покупок:\n' + '\n'.join(file_list)
 
