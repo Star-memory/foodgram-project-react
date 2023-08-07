@@ -1,29 +1,23 @@
+from django.db.models import Sum
+from django.http import HttpResponse
+from django.shortcuts import get_object_or_404
+from django_filters.rest_framework import DjangoFilterBackend
+from djoser.views import UserViewSet as DjoserUserViewSet
 from rest_framework import permissions, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
-
-from django.db.models import Sum
-
-from django.http import HttpResponse
-
-from djoser.views import UserViewSet as DjoserUserViewSet
-
-from django.shortcuts import get_object_or_404
-from django_filters.rest_framework import DjangoFilterBackend
-
+from reviews.models import (FavoriteRecipe, Follow, Ingredient, Recipe,
+                            RecipeIngredient, ShoppingCartRecipe, Tag)
 from users.models import User
-from reviews.models import (Tag, Recipe, Ingredient, RecipeIngredient,
-                            FavoriteRecipe, Follow, ShoppingCartRecipe)
 
-
-from .utils import (IngredientNameFilter, PagePagination, RecipeFilter)
-from .mixins import ListRetriveSet, CreateDestroyMixin
+from .mixins import CreateDestroyMixin, ListRetriveSet
 from .permissions import ReadOnlyTag
-from .serializers import (TagSerializer, RecipeReadSerializer,
-                          RecipeCreateSerializer, FollowSerializer,
-                          IngredientSerializer, UserSerializer,
-                          PasswordSerializer, UserRegistrationSerializer,
-                          FavoriteSerializer, ShoppingCartSerializer)
+from .serializers import (FavoriteSerializer, FollowSerializer,
+                          IngredientSerializer, PasswordSerializer,
+                          RecipeCreateSerializer, RecipeReadSerializer,
+                          ShoppingCartSerializer, TagSerializer,
+                          UserRegistrationSerializer, UserSerializer)
+from .utils import IngredientNameFilter, PagePagination, RecipeFilter
 
 
 class UserViewSet(DjoserUserViewSet, CreateDestroyMixin):
@@ -40,7 +34,7 @@ class UserViewSet(DjoserUserViewSet, CreateDestroyMixin):
     @action(detail=True, methods=['post', 'delete'],
             permission_classes=[permissions.IsAuthenticated])
     def subscribe(self, request, id):
-        """Добавление/удаление из списка любимых аторов"""
+        """Добавление/удаление из списка любимых аторов."""
         user = self.request.user
         author = get_object_or_404(User, id=id)
         if request.method == 'POST':
@@ -112,7 +106,7 @@ class RecipeViewSet(viewsets.ModelViewSet, CreateDestroyMixin):
     @action(detail=True, methods=['post', 'delete'],
             permission_classes=[permissions.IsAuthenticated])
     def favorite(self, request, pk):
-        """Добавление/удаление из списка любимых рецептов"""
+        """Добавление/удаление из списка любимых рецептов."""
         user = self.request.user
         recipe = get_object_or_404(Recipe, id=pk)
         if request.method == 'POST':
@@ -131,7 +125,7 @@ class RecipeViewSet(viewsets.ModelViewSet, CreateDestroyMixin):
             permission_classes=[permissions.IsAuthenticated],
             pagination_class=None)
     def shopping_cart(self, request, pk):
-        """Добавление/удаление из списка загрузки"""
+        """Добавление/удаление из списка загрузки."""
         user = self.request.user
         recipe_cart = get_object_or_404(Recipe, id=pk)
         if request.method == 'POST':
@@ -149,7 +143,7 @@ class RecipeViewSet(viewsets.ModelViewSet, CreateDestroyMixin):
     @action(detail=False, methods=['get'],
             permission_classes=[permissions.IsAuthenticated])
     def download_shopping_cart(self, request):
-        """Загрузка списка покупок"""
+        """Загрузка списка покупок."""
         user = request.user
         ingredient_sum = RecipeIngredient.objects.filter(
             recipe__shoppingcartrecipe__user=user).values(

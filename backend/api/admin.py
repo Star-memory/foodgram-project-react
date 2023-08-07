@@ -1,12 +1,7 @@
 from django.contrib import admin
-
-# from colorfield.widgets import ColorWidget
-# from colorfield.fields import ColorField
-
+from reviews.models import (FavoriteRecipe, Follow, Ingredient, Recipe,
+                            RecipeIngredient, ShoppingCartRecipe, Tag)
 from users.models import User
-from reviews.models import (Recipe, Tag, Ingredient,
-                            RecipeIngredient, FavoriteRecipe,
-                            Follow, ShoppingCartRecipe)
 
 
 class UserAdmin(admin.ModelAdmin):

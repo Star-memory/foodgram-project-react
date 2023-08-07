@@ -9,8 +9,6 @@ __pycache__/
 # Distribution / packaging
 frontend/node_modules/
 frontend/build/
-frontend/src/
-frontend/public/
 infra/nginx copy
 .Python
 build/

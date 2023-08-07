@@ -1,11 +1,7 @@
-from django.db import models
-
 from colorfield.fields import ColorField
-
-from django.core.exceptions import ValidationError
-
 from constants import constants
-
+from django.core.exceptions import ValidationError
+from django.db import models
 from users.models import User
 
 

@@ -1,13 +1,9 @@
-from rest_framework import serializers
-
-from drf_base64.fields import Base64ImageField
-
 from djoser.serializers import UserCreateSerializer, UserSerializer
-
+from drf_base64.fields import Base64ImageField
+from rest_framework import serializers
+from reviews.models import (FavoriteRecipe, Follow, Ingredient, Recipe,
+                            RecipeIngredient, ShoppingCartRecipe, Tag)
 from users.models import User
-from reviews.models import (Tag, Recipe, Ingredient,
-                            RecipeIngredient, FavoriteRecipe,
-                            Follow, ShoppingCartRecipe)
 
 
 class UserSerializer(UserSerializer):
