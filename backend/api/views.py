@@ -13,16 +13,16 @@ from users.models import User
 from .mixins import CreateDestroyMixin, ListRetriveSet
 from .permissions import ReadOnlyTag
 from .serializers import (FavoriteSerializer, FollowSerializer,
-                          IngredientSerializer, PasswordSerializer,
-                          RecipeCreateSerializer, RecipeReadSerializer,
-                          ShoppingCartSerializer, TagSerializer,
-                          UserRegistrationSerializer, UserSerializer)
+                          IngredientSerializer, RecipeCreateSerializer,
+                          RecipeReadSerializer, ShoppingCartSerializer,
+                          TagSerializer, UserSerializer)
 from .utils import IngredientNameFilter, PagePagination, RecipeFilter
 
 
 class UserViewSet(DjoserUserViewSet, CreateDestroyMixin):
     queryset = User.objects.all()
     permission_classes = [permissions.AllowAny]
+    serializer_class = UserSerializer
 
     @action(detail=False, methods=['get'],
             permission_classes=[permissions.IsAuthenticated]
@@ -64,20 +64,6 @@ class UserViewSet(DjoserUserViewSet, CreateDestroyMixin):
             recipes_page, many=True,
             context={'request': request})
         return paginator.get_paginated_response(serializer.data)
-
-    @action(detail=False, methods=['post'],
-            permission_classes=[permissions.IsAuthenticated])
-    def set_password(self, request):
-        serializer = PasswordSerializer(request.user, data=request.data)
-        if serializer.is_valid(raise_exception=True):
-            serializer.save()
-        return Response({'detail': 'Пароль успешно изменен!'},
-                        status=status.HTTP_204_NO_CONTENT)
-
-    def get_serializer_class(self):
-        if self.request.method == 'POST':
-            return UserRegistrationSerializer
-        return UserSerializer
 
 
 class TagViewSet(ListRetriveSet):

@@ -1,4 +1,4 @@
-from djoser.serializers import UserCreateSerializer, UserSerializer
+from djoser.serializers import UserSerializer
 from drf_base64.fields import Base64ImageField
 from rest_framework import serializers
 from reviews.models import (FavoriteRecipe, Follow, Ingredient, Recipe,
@@ -24,14 +24,6 @@ class UserSerializer(UserSerializer):
         if user.is_anonymous:
             return False
         return Follow.objects.filter(user=user, author=obj).exists()
-
-
-class UserRegistrationSerializer(UserCreateSerializer):
-
-    class Meta:
-        fields = ('email', 'username', 'first_name',
-                  'last_name', 'password')
-        model = User
 
 
 class TagSerializer(serializers.ModelSerializer):
